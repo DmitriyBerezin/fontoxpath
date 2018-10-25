@@ -1,4 +1,7 @@
+import moment from 'moment'
+
 import DayTimeDuration from './DayTimeDuration';
+import YearMonthDuration from './YearMonthDuration';
 import AbstractDuration from './AbstractDuration';
 
 /**
@@ -128,6 +131,10 @@ class DateTime {
 			this._minutes - timezoneToUse.getMinutes(),
 			this._seconds + this._secondFraction)
 		);
+	}
+
+	toMoment () {
+		return moment(this.toJavaScriptDate())
 	}
 
 	toString () {
@@ -348,6 +355,23 @@ DateTime.fromString = function (string) {
 		'xs:gDay');
 };
 
+DateTime.fromJavaScriptDate = function (date) {
+	return new DateTime(
+		date.getFullYear(),
+		date.getMonth() + 1,
+		date.getDate(),
+		date.getHours(),
+		date.getMinutes(),
+		date.getSeconds(),
+		0,
+		// date.getTimezoneOffset() / 60
+	)
+}
+
+DateTime.fromMoment = function (m) {
+	return DateTime.fromJavaScriptDate(m.toDate())
+}
+
 
 /**
  * @param   {DateTime}   dateTime1
@@ -442,7 +466,20 @@ export function subtract (dateTime1, dateTime2, implicitTimezone = undefined) {
  * @return  {!DateTime}
  */
 export function addDuration (dateTime, _duration) {
-	throw new Error(`Not implemented: adding durations to ${dateTime._type}`);
+	const curMoment = dateTime.toMoment()
+	let resMoment
+
+	if (_duration instanceof DayTimeDuration) {
+		const seconds = _duration.getRawSeconds()
+		resMoment = curMoment.add(seconds, 'seconds')
+	} else if (_duration instanceof YearMonthDuration) {
+		const months = _duration.getRawMonths()
+		resMoment = curMoment.add(months, 'months')
+	} else {
+		throw new Error(`Unsupported duration ${_duration}`)
+	}
+
+	return DateTime.fromMoment(resMoment)
 }
 
 
@@ -452,7 +489,20 @@ export function addDuration (dateTime, _duration) {
  * @return  {!DateTime}
  */
 export function subtractDuration (dateTime, _duration) {
-	throw new Error(`Not implemented: subtracting durations from ${dateTime._type}`);
+	const curMoment = dateTime.toMoment()
+	let resMoment
+
+	if (_duration instanceof DayTimeDuration) {
+		const seconds = _duration.getRawSeconds()
+		resMoment = curMoment.subtract(seconds, 'seconds')
+	} else if (_duration instanceof YearMonthDuration) {
+		const months = _duration.getRawMonths()
+		resMoment = curMoment.subtract(months, 'months')
+	} else {
+		throw new Error(`Unsupported duration ${_duration}`)
+	}
+
+	return DateTime.fromMoment(resMoment)
 }
 
 export default DateTime;
