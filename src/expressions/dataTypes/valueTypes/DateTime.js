@@ -363,8 +363,9 @@ DateTime.fromJavaScriptDate = function (date) {
 		date.getHours(),
 		date.getMinutes(),
 		date.getSeconds(),
-		0,
-		// date.getTimezoneOffset() / 60
+		secondFraction,
+		timezone,
+		'xs:date'
 	)
 }
 

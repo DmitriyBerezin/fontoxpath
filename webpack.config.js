@@ -24,6 +24,14 @@ module.exports = {
 		]
 	},
 
+	optimization: {
+		minimize: true
+	},
+
+	plugins: [
+		new webpack.ProgressPlugin()
+	],
+
 	externals: {
 		moment: 'moment'
 	},
